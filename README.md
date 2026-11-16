@@ -19,7 +19,7 @@ Reads a JSON snapshot (schema below, synthetic samples included) and applies fou
 
 | Rule | Severity | Fires when |
 | ---- | -------- | ---------- |
-| IP001 | HIGH | A reserved IP's `assigned_entity_id` is not in the export's known-entities list - it points at something that no longer exists in this inventory (dangling assignment). |
+| IP001 | HIGH | A reserved IP's `assigned_entity_id` is not in the export's known-entities list. That is a **suspect** dangling assignment, not proof the target was terminated: the conclusion only holds if the export is complete **and** covers that target's entity type (in OCI a reserved public IP can be assigned to a private IP on a VNIC, a load balancer, a NAT gateway, and similar targets - not just instances). Verify before releasing the address. |
 | IP002 | MEDIUM | A reserved IP has been unattached for more than 30 days (idle inventory nobody is using). |
 | IP003 | MEDIUM | A reserved IP has no `owner` tag - nobody is accountable for keeping or releasing it. |
 | IP004 | LOW | A reserved IP has no name metadata - its purpose is not recorded anywhere. |
@@ -58,12 +58,16 @@ python -m unittest discover -s tests -v   # 20 tests, stdlib only
 
 - **Offline only**: the snapshot is synthetic; nothing calls the OCI Network API or lists real
   public IPs.
-- IP001 means "the target is absent from this export's entity list" - if the export is partial,
-  the finding reflects the export, not the tenancy. Verify before releasing an address.
+- IP001 means "the target is absent from this export's entity list" - if the export is partial
+  or does not include that entity type, the finding reflects the export, not the tenancy.
+  A HIGH here is a prompt to verify with a complete export, never proof of a dangling or
+  terminated resource, and the synthetic samples demonstrate the rule, not a real tenancy.
 - The 30-day idle window (IP002) is a default, not OCI policy.
 - No billing claims: this audits inventory hygiene and assignment integrity, not cost.
-- Attachment is simplified to a single `assigned_entity_id`; OCI's private-IP/VNIC indirection
-  is not modeled.
+- Attachment is simplified to a single `assigned_entity_id`; OCI's assignment indirection
+  (private IP -> VNIC, or direct assignment to a load balancer / NAT gateway) is not modeled,
+  so the export's `known_entities` must cover every assigned target type for IP001 to mean
+  anything.
 
 ## Project status
 
