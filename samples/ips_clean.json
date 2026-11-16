@@ -1,0 +1,11 @@
+{
+  "known_entities": ["ocid1.instance.oc1..i9", "ocid1.loadbalancer.oc1..lb9"],
+  "reserved_ips": [
+    {"ocid": "ocid1.publicip.oc1..r9", "ip_address": "129.80.9.10", "name": "payments-api",
+     "created_at": "2026-11-01", "assigned_entity_id": "ocid1.instance.oc1..i9",
+     "tags": {"owner": "payments-team"}},
+    {"ocid": "ocid1.publicip.oc1..r10", "ip_address": "129.80.9.11", "name": "staging-lb",
+     "created_at": "2026-11-10", "assigned_entity_id": null,
+     "tags": {"owner": "platform-team"}}
+  ]
+}
