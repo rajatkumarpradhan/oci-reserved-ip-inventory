@@ -17,7 +17,7 @@ class Finding:
 
 
 def rule_dangling_assignment(snapshot: Snapshot, as_of: date) -> list:
-    """IP001 HIGH: assigned entity absent from the export's known entities."""
+    """IP001 HIGH: assigned entity absent from the export's known entities (suspect, not proven)."""
     del as_of
     out = []
     for ip in snapshot.reserved_ips:
@@ -29,7 +29,9 @@ def rule_dangling_assignment(snapshot: Snapshot, as_of: date) -> list:
                     ip=ip.ip_address,
                     detail=(
                         f"assigned to {ip.assigned_entity_id}, which is absent from this export's "
-                        f"known entities; the stable address points at something that no longer exists here"
+                        f"known-entities list; SUSPECT dangling assignment - absence from an export is "
+                        f"not proof the target is gone; confirm the export is complete for this entity "
+                        f"type before acting"
                     ),
                 )
             )
